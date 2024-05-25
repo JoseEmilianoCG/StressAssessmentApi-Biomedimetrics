@@ -21,8 +21,8 @@ def baselinescalc(eda_baseline_data, bvp_baseline_data):
     return eda_baseline, hr_baseline, sdsd_baseline, rmssd_baseline
 
 # Processing of probe data
-def probeprocessing(eda_probe_data, bvp_probe_data):
+def recordprocessing(eda_record_data, bvp_record_data):
     winsz, ovlap, order, freqrange, eda_fs, bvp_fs = parameters()
-    eda_probe = np.mean(pr.edaprocessing(eda_probe_data, eda_fs, winsz, ovlap, order),axis=1)
-    hr_probe, sdsd_probe, rmssd_probe = pr.bvpprocessing(bvp_probe_data, freqrange, bvp_fs, winsz, ovlap, order)
-    return eda_probe, hr_probe, sdsd_probe, rmssd_probe
+    eda_record = np.mean(pr.edaprocessing(eda_record_data, eda_fs, winsz, ovlap, order),axis=1)
+    hr_record, sdsd_record, rmssd_record = pr.bvpprocessing(bvp_record_data, freqrange, bvp_fs, winsz, ovlap, order)
+    return eda_record, hr_record, sdsd_record, rmssd_record

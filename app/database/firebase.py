@@ -1,15 +1,25 @@
 import os
-import firebase_admin
-from firebase_admin import credentials, storage, firestore
+import json
+import pyrebase
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-cred_path = os.path.join(current_dir, 'database', 'google-services.json')
+serviceAccountKey = os.path.join(current_dir, 'database', 'serviceAccountKey.json')
 
-cred = credentials.Certificate(cred_path)
-firebase_admin.initialize_app(cred, {'storageBucket':'**.appspot.com'})
 
-source_blob_name = 'dummy.json'
+databaseinfo_path = os.path.join(current_dir, 'database','databaseinfo.json' )
 
-db = firestore.client()
+with open(databaseinfo_path) as databaseinfo_file:
+    databaseinfo = json.load(databaseinfo_file)
 
-#def get_firebase_data():
+
+config = {
+  "apiKey": databaseinfo["apiKey"],
+  "authDomain": databaseinfo['authDomain'],
+  "databaseURL": databaseinfo['database_url'],
+  "storageBucket": databaseinfo['storage_bucket'],
+  "serviceAccount": serviceAccountKey
+}
+
+
+firebase = pyrebase.initialize_app(config)
+db = firebase.database()

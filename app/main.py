@@ -6,6 +6,11 @@ from flask import Flask, jsonify, Response, g, request
 from app.blueprints.activities import activities
 import uuid
 
+edaref = None
+hrref = None
+sdsdref = None
+rmssdref = None
+
 def create_app():
   app = Flask(__name__)
   app.register_blueprint(activities, url_prefix="/api/v1/activities")
