@@ -2,7 +2,7 @@ import os
 import json
 import pyrebase
 
-current_dir = os.path.dirname(os.path.abspath(__file__))
+current_dir = os.path.dirname(os.path.abspath('firebase.py'))
 serviceAccountKey = os.path.join(current_dir, 'database', 'serviceAccountKey.json')
 
 

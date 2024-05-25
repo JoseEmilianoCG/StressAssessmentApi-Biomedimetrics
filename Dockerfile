@@ -1,5 +1,5 @@
 # Especificar la versión de Python
-FROM python:3.12.3-slim
+FROM python:3.12-slim
 
 # Establecer variables de entorno
 ENV PYTHONUNBUFFERED True
