@@ -1,4 +1,5 @@
 import requests
+import re
 import numpy as np
 import pandas as pd
 from scipy import stats as st
@@ -41,7 +42,7 @@ def stream_handler(message):
             bvp_baseline_data, eda_baseline_data = format(new_data)
             eda_baseline, hr_baseline, sdsd_baseline, rmssd_baseline = baselinescalc(eda_baseline_data, bvp_baseline_data)
             actualizevariables(eda_baseline, hr_baseline, sdsd_baseline, rmssd_baseline)
-        else:
+        elif re.match(r'^record_\d+$', record_id):
             from main import edaref, hrref, sdsdref, rmssdref
             bvp_record_data, eda_record_data = format(new_data)
             eda_record, hr_record, sdsd_record, rmssd_record = recordprocessing(eda_record_data, bvp_record_data)
@@ -49,7 +50,10 @@ def stream_handler(message):
             data_record = pd.DataFrame(values,columns=feats)
             prediction = predict(data_record)
             predictionmode = st.mode(prediction)
-            db.child('stress_detection').set(predictionmode)
+            try:
+                db.child('stress_detection').set(predictionmode)
+            except:
+                print('It was not possible to send the prediction')
 
 
             

@@ -4,6 +4,8 @@ import json
 import time
 from flask import Flask, jsonify, Response, g, request
 from app.blueprints.activities import activities
+from app.database.firebase import db
+from app.utils.utils import stream_handler
 import uuid
 
 edaref = None
@@ -14,6 +16,13 @@ rmssdref = None
 def create_app():
   app = Flask(__name__)
   app.register_blueprint(activities, url_prefix="/api/v1/activities")
+
+  # Start firebase event listening
+  @app.before_first_request
+  def activate_job():
+      print("Listening to events")
+      db.listen(stream_handler)
+
   # Error 404 handler
   @app.errorhandler(404)
   def resource_not_found(e):
