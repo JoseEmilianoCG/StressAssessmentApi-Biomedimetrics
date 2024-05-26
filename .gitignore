@@ -3,7 +3,6 @@
 databaseconfig.py
 
 # Model
-stressmodelv1.pkl
 *.pkl
 
 # Byte-compiled / optimized / DLL files
