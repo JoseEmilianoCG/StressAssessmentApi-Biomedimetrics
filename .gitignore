@@ -1,6 +1,6 @@
 # Database keys
-google-services.json
 *.json
+databaseconfig.py
 
 # Model
 stressmodelv1.pkl

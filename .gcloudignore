@@ -1,0 +1,10 @@
+# This is the .gcloudignore file
+.venv/
+.git
+.gitignore
+
+
+!database/databaseconfig.py
+!database/serviceAccountKey.json
+
+!functions/stressmodelv1.pkl

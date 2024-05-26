@@ -1,5 +1,5 @@
 import numpy as np
-import processingfunctions as pr
+import app.functions.processingfunctions as pr
 
 def parameters():
     winsz = 30
