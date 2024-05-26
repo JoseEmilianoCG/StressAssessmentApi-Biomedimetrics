@@ -9,15 +9,11 @@ from flask import Flask, jsonify, Response, g, request
 from app import config
 from app.blueprints.activities import activities
 from app.database.firebase import db
-from app.globalvariables import actualizevariables
+from app.globalvariables import initializevariables, getvariables, actualizevariables
 from app.database.dataformatting import format
 from app.functions.processingpipeline import baselinescalc, recordprocessing
 from app.functions.model import predict
 
-
-# Initialize references
-#edaref, hrref, sdsdref, rmssdref = None, None, None, None
-edaref, hrref, sdsdref, rmssdref = 0.17116407244590068, 87.13205533786504, 131.6139883690689, 132.17071715761676
 
 feats = ['eda','hr','sdsd','rmssd']
 
@@ -47,7 +43,8 @@ def create_app():
         bvp_baseline_data, eda_baseline_data = format(data)
         eda_baseline, hr_baseline, sdsd_baseline, rmssd_baseline = baselinescalc(eda_baseline_data, bvp_baseline_data)
         actualizevariables(eda_baseline, hr_baseline, sdsd_baseline, rmssd_baseline)
-        return"Baseline received and processed"
+        eda_base, hr_base, sdsd_base, rmssd_base = getvariables()
+        return jsonify({'status' : "Baseline received and processed", 'edaref' : eda_base, 'hrref' : hr_base, 'sdsdref' : sdsd_base, 'rmssdref' : rmssd_base})
 
     @app.route('/record')
     def record():
@@ -65,7 +62,8 @@ def create_app():
         data =  db.child("data_acquired").child(last_record).get().val()
         bvp_record_data, eda_record_data = format(data)
         eda_record, hr_record, sdsd_record, rmssd_record = recordprocessing(eda_record_data, bvp_record_data)
-        values = np.transpose(np.vstack((eda_record / edaref, hr_record / hrref, sdsd_record / sdsdref, rmssd_record / rmssdref)))
+        eda_base, hr_base, sdsd_base, rmssd_base = getvariables()
+        values = np.transpose(np.vstack((eda_record / eda_base, hr_record / hr_base, sdsd_record / sdsd_base, rmssd_record / rmssd_base)))
         data_record = pd.DataFrame(values, columns=feats)
         prediction = predict(data_record)
         predictionmode = int(st.mode(prediction)[0])
@@ -102,5 +100,6 @@ app = create_app()
 
 if __name__ == "__main__":
     print("Starting app...")
+    initializevariables()
     app.run(host="0.0.0.0", port=5000)
 
