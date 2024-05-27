@@ -1,5 +1,3 @@
-import os
-import json
 import pyrebase
 from app.database.databaseconfig import config
 

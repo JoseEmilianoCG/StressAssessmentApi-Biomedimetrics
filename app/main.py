@@ -1,21 +1,12 @@
-import re
 import json
-import time
 import uuid
-import numpy as np
-import pandas as pd
-from scipy import stats as st
+import time
 from flask import Flask, jsonify, Response, g, request
 from app import config
 from app.blueprints.activities import activities
-from app.database.firebase import db
-from app.globalvariables import initializevariables, getvariables, actualizevariables
-from app.database.dataformatting import format
-from app.functions.processingpipeline import baselinescalc, recordprocessing
-from app.functions.model import predict
+from app.globalvariables import initializevariables
+from app.responseprotocols import baselineresponse, recordresponse
 
-
-feats = ['eda','hr','sdsd','rmssd']
 
 def create_app():
     app = Flask(__name__)
@@ -39,36 +30,13 @@ def create_app():
     
     @app.route('/baseline')
     def baseline():
-        data =  db.child("data_acquired").child("baseline").get().val()
-        bvp_baseline_data, eda_baseline_data = format(data)
-        eda_baseline, hr_baseline, sdsd_baseline, rmssd_baseline = baselinescalc(eda_baseline_data, bvp_baseline_data)
-        actualizevariables(eda_baseline, hr_baseline, sdsd_baseline, rmssd_baseline)
-        eda_base, hr_base, sdsd_base, rmssd_base = getvariables()
+        eda_base, hr_base, sdsd_base, rmssd_base = baselineresponse()
         return jsonify({'status' : "Baseline received and processed", 'edaref' : eda_base, 'hrref' : hr_base, 'sdsdref' : sdsd_base, 'rmssdref' : rmssd_base})
 
     @app.route('/record')
     def record():
-        childs = db.child("data_acquired").shallow().get().val()
-        max_number = -1
-        last_record = None
-        # Iterate over keys
-        for key in childs:
-            match = re.search(r'record_(\d+)', key)
-            if match:
-                number = int(match.group(1))
-                if number > max_number:
-                    max_number = number
-                    last_record = key
-        data =  db.child("data_acquired").child(last_record).get().val()
-        bvp_record_data, eda_record_data = format(data)
-        eda_record, hr_record, sdsd_record, rmssd_record = recordprocessing(eda_record_data, bvp_record_data)
-        eda_base, hr_base, sdsd_base, rmssd_base = getvariables()
-        values = np.transpose(np.vstack((eda_record / eda_base, hr_record / hr_base, sdsd_record / sdsd_base, rmssd_record / rmssd_base)))
-        data_record = pd.DataFrame(values, columns=feats)
-        prediction = predict(data_record)
-        predictionmode = int(st.mode(prediction)[0])
-        db.child('stress_detection').set(predictionmode)
-        return "Record received and processed"
+        predictionmode = recordresponse()
+        return jsonify({'status' : "Record received and processed, prediction done", 'prediction' : predictionmode})
         
 
     @app.route("/version", methods=["GET"], strict_slashes=False)
@@ -102,4 +70,3 @@ if __name__ == "__main__":
     print("Starting app...")
     initializevariables()
     app.run(host="0.0.0.0", port=5000)
-

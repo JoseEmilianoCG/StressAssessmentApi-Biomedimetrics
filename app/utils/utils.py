@@ -22,4 +22,4 @@ def generic_api_requests(method, url, payload={}, params={}):
     except Exception as e:
         print("RESPONSE ERROR :", e)
         return 0, e
-        
+      
