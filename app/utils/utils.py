@@ -1,6 +1,5 @@
 import requests
 
-feats = ['eda','hr','sdsd','rmssd']
 
 def generic_api_requests(method, url, payload={}, params={}):
     print("CURRENT REQUEST : ", method, url, payload)

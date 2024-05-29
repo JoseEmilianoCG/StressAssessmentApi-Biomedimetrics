@@ -1,6 +1,7 @@
 import json
 import uuid
 import time
+import logging
 from flask import Flask, jsonify, Response, g, request
 from app import config
 from app.blueprints.activities import activities
@@ -30,13 +31,20 @@ def create_app():
     
     @app.route('/baseline')
     def baseline():
-        eda_base, hr_base, sdsd_base, rmssd_base = baselineresponse()
-        return jsonify({'status' : "Baseline received and processed", 'edaref' : eda_base, 'hrref' : hr_base, 'sdsdref' : sdsd_base, 'rmssdref' : rmssd_base})
+        try:
+            eda_base, hr_base, sdsd_base, rmssd_base = baselineresponse()
+            return jsonify({'status' : "Baseline received and processed", 'edaref' : eda_base, 'hrref' : hr_base, 'sdsdref' : sdsd_base, 'rmssdref' : rmssd_base})
+        except Exception as e:
+            return jsonify({'status': "Error", 'message': str(e)}), 400
+        
 
     @app.route('/record')
     def record():
-        predictionmode = recordresponse()
-        return jsonify({'status' : "Record received and processed, prediction done", 'prediction' : predictionmode})
+        try:
+            predictionmode = recordresponse()
+            return jsonify({'status' : "Record received and processed, prediction done", 'prediction' : predictionmode})
+        except Exception as e:
+            return jsonify({'status': "Error", 'message': str(e)}), 400
         
 
     @app.route("/version", methods=["GET"], strict_slashes=False)

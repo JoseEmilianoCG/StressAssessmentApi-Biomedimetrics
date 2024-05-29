@@ -8,3 +8,4 @@
 !database/serviceAccountKey.json
 
 !functions/stressmodelv1.pkl
+!functions/stressmodelv2.pkl

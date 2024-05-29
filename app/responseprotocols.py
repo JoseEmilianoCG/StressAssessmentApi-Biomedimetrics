@@ -46,7 +46,9 @@ def recordresponse():
         # Get baseline/reference values for normalization
         eda_base, hr_base, sdsd_base, rmssd_base = getvariables()
         # Normalize record data, vstack and transpose, then create a frame for introduction to model
-        values = np.transpose(np.vstack((eda_record / eda_base, hr_record / hr_base, sdsd_record / sdsd_base, rmssd_record / rmssd_base)))
+        eda_norm = eda_record / eda_base; hr_norm = hr_record / hr_base; 
+        sdsd_norm = sdsd_record / sdsd_base; rmssd_norm = rmssd_record / rmssd_base;
+        values = np.transpose(np.vstack((eda_norm, hr_norm, sdsd_norm, rmssd_norm)))
         data_record = pd.DataFrame(values, columns=feats)
         ## Implement model for stress status classification ##
         prediction = predict(data_record)
